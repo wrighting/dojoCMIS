@@ -103,7 +103,6 @@ define(
                 },
 
                 queryOptions : {
-                    query : '*',
                     cmisselector : 'children' //(object|properties|children|allowedActions|relationships|renditions|content)
                 },
                 // The number of milliseconds to wait for a response
@@ -124,7 +123,7 @@ define(
                     }
                     return (usePath);
                 },
-                 
+
                 get : function(id, options) {
                     // summary:
                     //              Retrieves an object by its identity. This will trigger a (jsonp) GET
@@ -163,12 +162,12 @@ define(
                     });
                     var results = new Deferred();
                     deferred.then(lang.hitch(this, function(data) {
-                            results.resolve(this._modifyQueryResponse(data));
+                        results.resolve(this._modifyQueryResponse(data));
                     }));
 
                     return (results);
                 },
-               
+
                 getMetadata : function(id, options) {
                     // summary:
                     //          Returns metadata about the object
@@ -213,7 +212,7 @@ define(
                         timeout : this.timeout
                     });
                     var results = new Deferred();
-                    deferred.then(lang.hitch(this,function(data) {
+                    deferred.then(lang.hitch(this, function(data) {
                         //console.log(data);
                         results.resolve(this._modifyQueryResponse(data));
                     }), function(error) {
@@ -246,7 +245,7 @@ define(
                     }
                     return ret;
                 },
-                
+
                 put : function(object, options) {
                     // summary:
                     //          Updates an object. This will trigger a POST request to the server
@@ -555,7 +554,7 @@ define(
                     return (this._doPost(params, options));
                 },
 
-                _modifyQueryResponse: function (data) {
+                _modifyQueryResponse : function(data) {
                     var ret;
                     if (this.succinct) {
                         ret = data.succinctProperties;
@@ -584,29 +583,40 @@ define(
 
                     queryParams = queryParams || '';
 
-                    var hasQuestionMark = this.target.indexOf("?") > -1;
+                    var requestURL = this.target;
+
+                    var hasQuestionMark = requestURL.indexOf("?") > -1;
                     //query object is converted to a list of parameters
                     if (queryParams && typeof queryParams == "object") {
                         var newOptions = lang.clone(this.queryOptions);
                         lang.mixin(newOptions, queryParams);
-                        var usePath = this._usePath(newOptions.query, options);
-                        if (usePath) {
-                            queryParams = newOptions.query;
-                        } else {
-                            queryParams = "?objectId=" + newOptions.query;
-                            hasQuestionMark = true;
+                        if (typeof newOptions.path != "undefined") {
+                            var usePath = this._usePath(newOptions.path, options);
+                            if (usePath) {
+                                queryParams = newOptions.path;
+                            }
+                            delete newOptions.path;
                         }
-                        delete newOptions.query;
+                        if (newOptions.statement) {
+                            newOptions.cmisselector = 'query';
+                            requestURL = this.base;
+                        }
                         optionsParams = xhr.objectToQuery(newOptions);
-                        queryParams += (hasQuestionMark ? "&" : "?") + optionsParams;
+                        queryParams = (hasQuestionMark ? "&" : "?") + optionsParams;
                     } else {
                         //queryParams should be a string
                         var sep = '&';
                         if (!hasQuestionMark) {
-                            if (queryParams.indexOf("?") < 0) {
+                            hasQuestionMark = queryParams.indexOf("?");
+                            if (hasQuestionMark < 0) {
                                 sep = '?';
                             }
-                            queryParams += sep + 'cmisselector=' + this.queryOptions.cmisselector;
+                            var cmisselector = this.queryOptions.cmisselector;
+                            if (queryParams.indexOf("statement=") > -1) {
+                                cmisselector = 'query';
+                                requestURL = this.base;
+                            }
+                            queryParams += sep + 'cmisselector=' + cmisselector;
                         }
                     }
                     if (options.start >= 0 || options.count >= 0) {
@@ -637,7 +647,7 @@ define(
                         queryParams += (queryParams || hasQuestionMark ? "&" : "?") + "succinct=true";
                     }
 
-                    var deferred = script.get(this.target + (queryParams || ""), {
+                    var deferred = script.get(requestURL + (queryParams || ""), {
                         jsonp : "callback",
                         timeout : this.timeout
                     });
@@ -650,7 +660,16 @@ define(
                         var objects = data.objects;
                         var newData = [];
                         if (typeof objects == "undefined") {
-                            newData[0] = this._modifyQueryResponse(data);
+                            var queryResults = data.results;
+                            if (typeof queryResults == "undefined") {
+                                newData[0] = this._modifyQueryResponse(data);
+                            } else {
+                                for (var i = 0; i < queryResults.length; i++) {
+                                    //console.log(objects[i]);
+                                    newData[i] = this._modifyQueryResponse(queryResults[i]);
+                                }
+                            }
+
                         } else {
                             for (var i = 0; i < objects.length; i++) {
                                 //console.log(objects[i]);
@@ -690,7 +709,7 @@ define(
                         usePath : false
                     });
                 },
- 
+
             });
 
         });
