@@ -72,6 +72,8 @@ define(
                 // whether to return succinct results
                 succinct : true,
 
+                //if true remove excludedProperties from put, if false only use allowedProperties
+                putExclude : true,
                 // properties excluded from put
                 excludeProperties : [
                         'cmis:allowedChildObjectTypeIds', 'cmis:path', 'cmis:creationDate', 'cmis:changeToken', 'cmis:lastModifiedBy',
@@ -302,27 +304,38 @@ define(
 
                     for ( var key in properties) {
 
-                        var update = true;
-                        for ( var ex in this.excludeProperties) {
-                            if (this.excludeProperties[ex] === key) {
-                                update = false;
-                                break;
+                        var update = this.putExclude;
+                        //In practice only one of these will apply
+                        if (update) {
+                            for ( var ex in this.excludeProperties) {
+                                if (this.excludeProperties[ex] === key) {
+                                    update = false;
+                                    break;
+                                }
                             }
-                        }
-                        for ( var inc in this.allowedProperties) {
-                            if (this.allowedProperties[inc] === key) {
-                                update = true;
-                                break;
+                        } else {
+                            for ( var inc in this.allowedProperties) {
+                                if (this.allowedProperties[inc] === key) {
+                                    update = true;
+                                    break;
+                                }
                             }
                         }
                         if (update) {
-                            objectData["propertyId[" + i + "]"] = key;
                             var value;
                             if (this.succinct) {
                                 value = properties[key];
                             } else {
                                 value = properties[key].value;
                             }
+                            //If the object was created via a CMIS query it could be of the form t.cm:title
+                            //in which case we want to remove the t.
+                            var alias = key.indexOf('.');
+                            if (alias > -1) {
+                                key = key.substr(alias + 1)
+                            }
+                            objectData["propertyId[" + i + "]"] = key;
+                            
                             objectData["propertyValue[" + i + "]"] = value;
                             i++;
                         }
