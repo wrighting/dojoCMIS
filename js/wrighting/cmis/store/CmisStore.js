@@ -302,6 +302,20 @@ define(
 
                     var i = 0;
 
+                    //Resolve properties
+                    //If namespaces are used i.e. a CMIS query has been used to retrieve the data
+                    //then it's possible that you will have a non-namespace(via a get from somewhere...) 
+                    //and a namespaced property - you don't want both so assume the namespaced one is correct
+                    for ( var key in properties) {
+                        //If the object was created via a CMIS query it could be of the form t.cm:title
+                        //in which case we want to remove the t.
+                        var alias = key.indexOf('.');
+                        if (alias > -1) {
+                            var noaliaskey = key.substr(alias + 1)
+                            properties[noaliaskey] = properties[key];
+                            delete properties[key];
+                        }
+                    }
                     for ( var key in properties) {
 
                         var update = this.putExclude;
@@ -328,16 +342,12 @@ define(
                             } else {
                                 value = properties[key].value;
                             }
-                            //If the object was created via a CMIS query it could be of the form t.cm:title
-                            //in which case we want to remove the t.
-                            var alias = key.indexOf('.');
-                            if (alias > -1) {
-                                key = key.substr(alias + 1)
+                            //Sometimes null (== "") causes problems e.g. datetime
+                            if (value != null) {
+                                objectData["propertyId[" + i + "]"] = key;
+                                objectData["propertyValue[" + i + "]"] = value;
+                                i++;
                             }
-                            objectData["propertyId[" + i + "]"] = key;
-                            
-                            objectData["propertyValue[" + i + "]"] = value;
-                            i++;
                         }
                     }
 
