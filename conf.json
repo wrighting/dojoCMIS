@@ -1,0 +1,27 @@
+{
+    "tags": {
+        "allowUnknownTags": true
+    },
+    "source": {
+        "include": [],
+        "exclude": [],
+        "includePattern": ".+\\.js(doc)?$",
+        "excludePattern": "(^|\\/|\\\\)\\$"
+    },
+    "plugins": [
+      "src/jsdoc-plugins/customization-support-tags"
+    ],
+    "templates": {
+        "cleverLinks": false,
+        "monospaceLinks": false
+    },
+    "opts": {
+        "template": "src/jsdoc-templates/cggh",
+        "encoding": "utf8",
+        "destination": "../../docs",
+        "recurse": true,
+        "query": "value",
+        "private": true,
+        "lenient": false
+    }
+}

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>dojoCMIS</artifactId>
+	<name>dojoCMIS</name>
+	<version>1.0.0</version>
+	<packaging>jar</packaging>
+	<description>Manages the lifecycle of the cggh-publications-share AMP (Alfresco Module Package)</description>
+
+	<parent>
+		<groupId>org.wrighting</groupId>
+		<artifactId>wrighting-dojo-cmis</artifactId>
+		<version>0.0.9-SNAPSHOT</version>
+	</parent>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<dependency.dgrid.version>0.3.17</dependency.dgrid.version>
+		<dependency.put-selector.version>0.3.5</dependency.put-selector.version>
+	</properties>
+
+	<build>
+
+		<!-- Everything gets place into the META-INF folder of the JAR because 
+			Surf (the expected platform for Aikau) will be able to access resources from 
+			that location via the /res/ path -->
+		<resources>
+			<!-- By default we're going to place the source files into a versioned 
+				path... -->
+			<resource>
+				<targetPath>META-INF/js/${project.artifactId}/${project.version}/cggh</targetPath>
+				<filtering>false</filtering>
+				<directory>${basedir}/src/main/resources/cggh</directory>
+			</resource>
+
+			<!-- Put the release notes in the root of the JAR file -->
+			<resource>
+				<targetPath>.</targetPath>
+				<filtering>true</filtering>
+				<includes>
+					<include>ReleaseNotes.md</include>
+				</includes>
+				<directory>${basedir}</directory>
+			</resource>
+
+			<!-- ...but everything else goes into a standard path -->
+			<resource>
+				<targetPath>META-INF/js/lib</targetPath>
+				<filtering>false</filtering>
+				<directory>${basedir}/src/main/resources/lib</directory>
+			</resource>
+
+			<resource>
+				<directory>${project.build.outputDirectory}/cggh</directory>
+				<targetPath>${project.build.testOutputDirectory}/testApp/WEB-INF/classes/cggh</targetPath>
+			</resource>
+
+		</resources>
+
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>testApp/WEB-INF/surf.xml</include>
+				</includes>
+			</testResource>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>testApp/WEB-INF/surf.xml</exclude>
+				</excludes>
+			</testResource>
+		</testResources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.9</version>
+				<executions>
+					<execution>
+						<id>unpack-dependencies</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.webjars</groupId>
+									<artifactId>dgrid</artifactId>
+									<version>${dependency.dgrid.version}</version>
+									<overWrite>true</overWrite>
+									<outputDirectory>${basedir}/target/classes</outputDirectory>
+									<excludes>**/META-INF/resources/webjars/dgrid/0.3.17/test/**</excludes>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.webjars</groupId>
+									<artifactId>put-selector</artifactId>
+									<version>${dependency.put-selector.version}</version>
+									<overWrite>true</overWrite>
+									<outputDirectory>${basedir}/target/classes</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Generate jsdoc using a Maven plugin (Command: mvn jsdoc3:jsdoc3) -->
+			<plugin>
+				<groupId>com.phasebash.jsdoc</groupId>
+				<artifactId>jsdoc3-maven-plugin</artifactId>
+				<version>1.1.0</version>
+				<configuration>
+					<recursive>true</recursive>
+					<directoryRoots>
+						<directoryRoot>${basedir}/src/main/resources/cggh/</directoryRoot>
+					</directoryRoots>
+					<templateDirectory>${basedir}/src/jsdoc-templates/cggh</templateDirectory>
+					<configFile>${basedir}/conf.json</configFile>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<skipIfEmpty>true</skipIfEmpty>
+					<excludes>
+						<exclude>target/classes/**</exclude>
+						<exclude>node_modules/**</exclude>
+					</excludes>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+						</manifest>
+						<manifestEntries>
+							<Implementation-Version>${project.version}</Implementation-Version>
+							<Build-Date>${maven.build.timestamp}</Build-Date>
+						</manifestEntries>
+						<manifestSections>
+							<manifestSection>
+								<name>dojoCMIS Libraries</name>
+								<manifestEntries>
+									<Dojo>${dependency.dojo.version}</Dojo>
+								</manifestEntries>
+							</manifestSection>
+						</manifestSections>
+					</archive>
+				</configuration>
+			</plugin>
+			<!-- Compress JavaScript files and store as *-min.js -->
+
+			<plugin>
+				<groupId>net.alchim31.maven</groupId>
+				<artifactId>yuicompressor-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>compress-js</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>compress</goal>
+						</goals>
+						<configuration>
+							<excludes>
+								<exclude>**/node_modules/**</exclude>
+								<exclude>**/js/**</exclude>
+								<exclude>**/src/**</exclude>
+								<exclude>**/Gruntfile.js</exclude>
+								<exclude>**/webscripts/**</exclude>
+								<exclude>**/site-webscripts/**</exclude>
+								<exclude>**/*.lib.js</exclude>
+								<exclude>**/*.css</exclude>
+							</excludes>
+							<warSourceDirectory>src/main/resources/META-INF</warSourceDirectory>
+							<jswarn>false</jswarn>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+</project>

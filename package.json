@@ -1,0 +1,40 @@
+{
+  "name": "dojoCMIS",
+  "version": "1.0.0",
+  "directories": {
+    "src/main": "."
+  },
+  "devDependencies": {
+    "intern-geezer": "1.6.2",
+    "grunt": "0.4.2",
+    "http-proxy": "0.10.3",
+    "glob": "3.2.7",
+    "jsgi-node": "0.3.1",
+    "formidable": "1.0.14",
+    "when": "2.7.0",
+    "intern": "~3.0.4"
+  },
+  "main": "main",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "description": "",
+  "bugs": "https://github.com/wrighting/dojoCMIS/issues",
+  "repositories": [
+    {
+      "type": "git",
+      "url": "git@github.com:wrighting/dojoCMIS.git"
+    }
+  ],
+  "dependencies": {
+    "dojo": "~1.10.4"
+  },
+  "keywords": [
+    "JavaScript",
+    "Dojo",
+    "Toolkit",
+    "CMIS"
+  ],
+  "homepage": "http://tech.wrighting.org/",
+  "dojoBuild": "wrighting.profile.js"
+}

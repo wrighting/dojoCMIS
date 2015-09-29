@@ -45,7 +45,7 @@ define([
                     "succinctProperties" : {
                         "cmis:allowedChildObjectTypeIds" : null,
                         "cmis:objectTypeId" : "cmis:folder",
-                        "cmis:path" : "\/wrighting\/tests\/unit\/cmisdata\/newFolder1",
+                        "cmis:path" : "\/src\/grunt\/tests\/unit\/cmisdata\/newFolder1",
                         "cmis:name" : "newFolder1",
                         "cmis:creationDate" : 1402906027801,
                         "cmis:secondaryObjectTypeIds" : [
@@ -341,7 +341,7 @@ define([
                             "queryName" : "cmis:path",
                             "type" : "string",
                             "cardinality" : "single",
-                            "value" : "\/wrighting\/tests\/unit\/cmisdata\/Test"
+                            "value" : "\/src\/grunt\/tests\/unit\/cmisdata\/Test"
                         },
                         "cmis:name" : {
                             "id" : "cmis:name",

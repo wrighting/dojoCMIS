@@ -8,8 +8,8 @@ module.exports = function (grunt) {
 			packages: [
 				{ name: 'intern', location: 'node_modules/intern-geezer' },
 				{ name: 'when', location: 'node_modules/when', main: 'when' },
-				{ name: 'dojo', location: 'lib/dojo-1.9.3' },
-				{ name: 'wrighting', location: './wrighting' }
+				{ name: 'dojo', location: 'node_modules/intern-geezer/node_modules/dojo' },
+				{ name: 'wrighting', location: './src/main/resources/wrighting' }
 			],
 			map: {
 				'*': {
@@ -26,14 +26,14 @@ module.exports = function (grunt) {
 			local: {
 				options: {
 					runType: 'runner',
-					config: 'wrighting/tests/intern.local',
+					config: 'dojoCMIS/src/grunt/tests/intern.local',
 					reporters: ['runner']
 				}
 			},
 			remote: {
 				options: {
 					runType: 'runner',
-					config: 'wrighting/tests/intern',
+					config: 'dojoCMIS/src/grunt/tests/intern',
 					reporters: ['runner']
 				}
 			},
@@ -41,14 +41,14 @@ module.exports = function (grunt) {
 				options: {
 					runType: 'runner',
 					proxyOnly: true,
-					config: 'wrighting/tests/intern.proxy',
+					config: 'src/grunt/tests/intern.proxy',
 					reporters: ['runner']
 				}
 			},
 			node: {
 				options: {
 					runType: 'client',
-					config: 'wrighting/tests/intern',
+					config: 'dojoCMIS/src/grunt/tests/intern',
 					reporters: ['console']
 				}
 			}
@@ -58,7 +58,7 @@ module.exports = function (grunt) {
 	var servicesServer;
 	grunt.registerTask('proxy', function () {
 		var done = this.async();
-		req(['wrighting/tests/services/main'], function (services) {
+		req(['dojoCMIS/src/grunt/tests/services/main'], function (services) {
 			services.start().then(function (server) {
 				servicesServer = server;
 				done(true);

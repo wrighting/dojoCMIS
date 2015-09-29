@@ -55,7 +55,7 @@ return nextApp(request);
 
 exports.start = function (port) {
 return nodefn.call(glob, '**/*.service.js', {
-cwd: './wrighting/tests/services',
+cwd: './src/grunt/tests/services',
 }).then(function (files) {
 return when.map(files, function (filename) {
 return require('./' + filename.slice(0, -3)).then(function (module) {

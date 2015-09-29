@@ -56,21 +56,24 @@ define({
 	// can be used here
 	loader: {
 		// Packages that should be registered with the loader in each testing environment
-		packages: [ { name: 'wrighting-testing', location: '.' } ],
+		packages: [ 
+				{ name: 'dojoCMIS-testing', location: '.' },
+				{ name: 'wrighting', location: './src/main/resources/wrighting' }
+			 ],
                 map: {
                      wrighting: {
-'dojo': 'lib/dojo-1.9.3/dojo',
+'dojo': './node_modules/dojo',
 'wrighting': 'wrighting',
 'intern/dojo': 'intern/node_modules/dojo'
                      }
-                }
+		}
 	},
 
 	// Non-functional test suite(s) to run in each browser
-	suites: [ 'wrighting/tests/unit/all' /* 'myPackage/tests/foo', 'myPackage/tests/bar' */ ],
+	suites: [ 'src/grunt/tests/unit/all' /* 'myPackage/tests/foo', 'myPackage/tests/bar' */ ],
 
 	// Functional test suite(s) to run in each browser once non-functional tests are completed
-	functionalSuites: [ 'wrighting/test/functional/all' /* 'myPackage/tests/functional' */ ],
+	functionalSuites: [ 'src/grunt/tests/functional/all' /* 'myPackage/tests/functional' */ ],
 
 	// A regular expression matching URLs to files that should not be included in code coverage analysis
 	excludeInstrumentation: /^(?:node_modules|tests)\//

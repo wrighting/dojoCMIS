@@ -16,7 +16,7 @@ https://github.com/theintern/intern#quick-start
 apt-get install npm
 npm install intern --save-dev
 apt-get install nodejs
-npm install -g grunt-cli
+sudo npm install -g grunt-cli
 sudo ln -s `which nodejs` /usr/local/bin/node
 
 npm install
@@ -30,7 +30,7 @@ Running tests
 grunt test:proxy
 
 To run tests look at the console in the browser at:
-http://localhost:9001/__intern/client.html?config=wrighting/tests/intern
+http://localhost:9001/__intern/client.html?config=src/grunt/tests/intern
 
 To run from the command line - No tests at presents
-node_modules/.bin/intern-client config=wrighting/tests/intern
+node_modules/.bin/intern-client config=src/grunt/tests/intern

@@ -10,154 +10,90 @@
                async: true,
                parseOnLoad: false,
                packages: [
-                  { name: "dojo", location: location.pathname.replace(/\/[^/]+$/, '') + '/js/lib/dojo-1.9.3/dojo'},
-                  { name: "dijit", location: location.pathname.replace(/\/[^/]+$/, '') + '/js/lib/dojo-1.9.3/dijit'},
-                  { name: "dojox", location: location.pathname.replace(/\/[^/]+$/, '') + '/js/lib/dojo-1.9.3/dojox'},
-                  { name: "wrighting", location: location.pathname.replace(/\/[^/]+$/, '') + '/js/wrighting'}
+                  { name: "dojo", location: location.pathname.replace(/\/[^/]+$/, '') + '/js/lib/dojo-1.10.4/dojo'},
+                  { name: "dijit", location: location.pathname.replace(/\/[^/]+$/, '') + '/js/lib/dojo-1.10.4/dijit'},
+                  { name: "dgrid", location: location.pathname.replace(/\/[^/]+$/, '') + '/target/classes/META-INF/resources/webjars/dgrid/0.3.17'},
+                  { name: "put-selector", location: location.pathname.replace(/\/[^/]+$/, '') + '/target/classes/META-INF/resources/webjars/put-selector/0.3.5'},
+                  { name: "xstyle", location: location.pathname.replace(/\/[^/]+$/, '') + '/src/main/resources/xstyle'},
+                  { name: "cggh", location: location.pathname.replace(/\/[^/]+$/, '') + '/src/main/resources/cggh'}
 
                ]
             };
          </script>
-         <script type="text/javascript" src="js/lib/dojo-1.9.3/dojo/dojo.js"></script>
+         <script type="text/javascript" src="node_modules/dojo/dojo.js"></script>
 <style media="screen" type="text/css">
-@import url("js/lib/dojo-1.9.3/dijit/themes/claro/claro.css");
+@import url("js/lib/dojo-1.10.4/dijit/themes/claro/claro.css");
 </style>
+	<style>
+		.errorMessage {
+			height: 1em;
+			margin: 1em 2em;
+			padding: 1em 2em;
+
+			background-color: #fcc;
+			color: #900;
+		}
+		.hidden {
+			display: none;
+		}
+	</style>
 <script> 
 
-require([
-    "dojo/_base/declare", "dojo/_base/window", 
-    "dijit/tree/ObjectStoreModel", "dojo/store/Observable","dijit/Tree",
-    "wrighting/cmis/store/CmisStore",
-    "dojo/domReady!"
-], function(declare, win, ObjectStoreModel, Observable, Tree, CmisStore){
 
- var targetRoot;
-                                targetRoot = "https://localhost/alfresco/api/-default-/public/cmis/versions/1.1/browser",
-                                this.testFolder = '/Sites/test/documentLibrary/Test';
-                                this.cmisStore = new CmisStore({
-                                        base: targetRoot,
-                                        succinct: false
-                                });
+	require(
+			[ "dojo/dom", "cggh/cmis/CmisGrid", "dojo/domReady!" ],
+			function(dom, CmisGrid) {
 
-    this.treeStore = new Observable(this.cmisStore);
-    // Create the model
-    var model = new ObjectStoreModel({
-        store: this.treeStore,
-        query: { query: this.testFolder, cmisselector: 'object'},
-	// METHODS BELOW ARE NEEDED BY THE TREE MODEL
-        labelAttr: "cmis:name",
-                mayHaveChildren : function(data) {
-                    if (data['cmis:baseTypeId'].value == 'cmis:folder') {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                },
-/**
-* Callback to do notifications about new, updated, or deleted items.
-* @param {object} parent item
-* @param {array} children
-*/
-onChildrenChange: function(data, children) {
-           console.log(data);},
+				var	targetRoot = "http://alfresco5.cggh.org:8080/alfresco/api/-default-/public/cmis/versions/1.1/browser";
+				var	testFolder = '/Sites/aaa-upgrade-test-site/documentLibrary/Test';
 
-/**
-* Callback whenever an item has changed, so that Tree can update the label, icon, etc.
-* Note that changes to an item's children or parent(s) will trigger an onChildrenChange()
-* so you can ignore those changes here.
-* @param {object} object
-*/
-onChange: function(data) {
-           console.log(data);},
-
-
-    });
-
-    // Custom TreeNode class (based on dijit.TreeNode) that allows rich text labels
-    var MyTreeNode = declare(Tree._TreeNode, {
-        _setLabelAttr: {node: "labelNode", type: "innerHTML"}
-    });
-
-    // Create the Tree.
-    this.tree = new Tree({
-        model: model
-    });
-    this.tree.placeAt("foldertree");
-    this.tree.startup();
-});
-
-function getSelectedId() {
-require(['dojo/dom', "dojo/_base/lang", 'wrighting/cmis/store/CmisStore'], function(dom,lang,CmisStore) {
-		var selectedObject = this.tree.get("selectedItems")[0];
-		if(!selectedObject){
-			return alert("No object selected");
-		}
-
-                return(this.treeStore.getIdentity(selectedObject));
-});
-}
-function doRemove() {
-require(['dojo/dom', "dojo/_base/lang", 'wrighting/cmis/store/CmisStore'], function(dom,lang,CmisStore) {
-		var selectedObject = this.tree.get("selectedItems")[0];
-  this.treeStore.remove(selectedObject).then(lang.hitch(this,function(result){
-                       console.log(result);
-                     }), function (error) {
-                       console.log(error);
-                     }, function (progress) {
-                        console.log(progress);
-                     });
-});
-}
-
-function doCreate() {
-require(['dojo/dom', "dojo/_base/lang", "dojo/dom-attr"], function(dom,lang,domAttr) {
-
-//                console.log(result);
-		var selectedObject = this.tree.get("selectedItems")[0];
-                var parentNode = dom.byId("folderId");
-                domAttr.set(parentNode,'value', getSelectedId());
-
-                  var myform = dom.byId("createdochtmlid");
-                  this.treeStore.add({form: myform}, { parent: selectedObject }).then(lang.hitch(this,function( result) {
-                       console.log(result);
-                     }));
-
-})};
-
+				this.grid = new CmisGrid(
+						{
+							targetRoot : targetRoot,
+							query : {
+								/*
+								 'statement' : 'SELECT * FROM cgghPub:publicationFolder ' +
+								 'join cgghPub:publication as p on cmis:objectId = p.cmis:objectId ' + 
+								 'join cm:titled as t on cmis:objectId = t.cmis:objectId',
+								 */
+								path : testFolder
+							},
+							columns : [ {
+								field : "cmis:name",
+								formatter : this.formatLinkFunction
+							}, {
+								parentType : "cggh:collaboration",
+								field : "cggh:ragStatus"
+							}, {
+								parentType : "cggh:collaboration",
+								field : "cggh:webTitleApproved"
+							}, {
+								parentType : "cggh:collaboration",
+								field : "cmis:lastModificationDate"
+							}, {
+								parentType : "cggh:collaboration",
+								field : "cggh:species"
+							}, {
+								field : "cmis:createdBy"
+							}, {
+								parentType : "cggh:collaboration",
+								field : "cmis:creationDate"
+							} ]
+						});
+				var messageNode = dom.byId('message');
+				this.grid.on('dgrid-error', function(event) {
+				    // Display an error message above the grid when an error occurs.
+				    messageNode.className = 'errorMessage';
+				    messageNode.innerHTML = event.error.message;
+				});
+				this.grid.placeAt("grid-place");
+				this.grid.startup();
+			});
 </script>
 </head>
 
 <body id="Share" class="yui-skin-lightTheme claro alfresco-share">
-<form id="createdochtmlid" action="" target="createresultframe" enctype="multipart/form-data" method="post">
-<fieldset>
-<legend>Create document HTML</legend>
-<table>
-<tr>
-<td><label for="name">Name:</label></td>
-<td><input name="propertyValue[0]" type="text" id="name" value="My Document"/></td>
-</tr>
-<tr>
-<td><label for="typeId">Type-Id:</label></td>
-            <td><input name="propertyValue[1]" type="text" id="typeId" value="cmis:document"/></td>
-</tr>
-<tr>
-<td><label for="folderId">Folder-Id:</label></td>
-<td><input type="text" id="folderId" name="objectId" value="ff8026ea-e89b-41e6-837f-36b74a15fff8"/>
-<div id="foldertree"></div></td>
-</tr>
-<tr>
-<td><label for="contentId">Content:</label></td>
-<td><input id="contentId" name="Browse..." type="file" size="50"/></td>
-</tr>
-<tr>
-<td><input id="createdochtml" type="submit" value="Create Doc!" onclick="doCreate()"/> <button onclick="doRemove()">Remove</button></td>
-<td></td>
-</tr>
-</table>	
-</fieldset>
-<input name="propertyId[0]" type="hidden" value="cmis:name" />
-       <input name="propertyId[1]" type="hidden" value="cmis:objectTypeId" />
-       <input name="cmisaction" type="hidden" value="createDocument" />
-</form>
+<div id="message" class="message hidden"></div>
+<div id="grid-place"></div></td>
 </body>
 </html>
