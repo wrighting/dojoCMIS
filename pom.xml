@@ -2,17 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.wrighting</groupId>
 	<artifactId>dojoCMIS</artifactId>
 	<name>dojoCMIS</name>
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
-	<description>Manages the lifecycle of the cggh-publications-share AMP (Alfresco Module Package)</description>
+	<description>Contains the dojoCMIS code together with dgrid for convenience</description>
 
-	<parent>
-		<groupId>org.wrighting</groupId>
-		<artifactId>wrighting-dojo-cmis</artifactId>
-		<version>0.0.9-SNAPSHOT</version>
-	</parent>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -29,9 +26,9 @@
 			<!-- By default we're going to place the source files into a versioned 
 				path... -->
 			<resource>
-				<targetPath>META-INF/js/${project.artifactId}/${project.version}/cggh</targetPath>
+				<targetPath>META-INF/js/${project.artifactId}/${project.version}/wrighting</targetPath>
 				<filtering>false</filtering>
-				<directory>${basedir}/src/main/resources/cggh</directory>
+				<directory>${basedir}/src/main/resources/wrighting</directory>
 			</resource>
 
 			<!-- Put the release notes in the root of the JAR file -->
@@ -44,6 +41,18 @@
 				<directory>${basedir}</directory>
 			</resource>
 
+         <resource>
+            <!-- Path has to be aligned with version because Surf caches by XML path -->
+            <targetPath>./alfresco/site-data/extensions/${project.version}</targetPath>
+            <filtering>true</filtering>
+            <directory>${basedir}/src/main/resources/extension-module</directory>
+         </resource>
+
+			<resource>
+				<targetPath>META-INF/js/lib/xstyle</targetPath>
+				<filtering>false</filtering>
+				<directory>${basedir}/src/main/resources/xstyle</directory>
+			</resource>
 			<!-- ...but everything else goes into a standard path -->
 			<resource>
 				<targetPath>META-INF/js/lib</targetPath>
@@ -52,8 +61,8 @@
 			</resource>
 
 			<resource>
-				<directory>${project.build.outputDirectory}/cggh</directory>
-				<targetPath>${project.build.testOutputDirectory}/testApp/WEB-INF/classes/cggh</targetPath>
+				<directory>${project.build.outputDirectory}/wrighting</directory>
+				<targetPath>${project.build.testOutputDirectory}/testApp/WEB-INF/classes/wrighting</targetPath>
 			</resource>
 
 		</resources>
@@ -118,9 +127,9 @@
 				<configuration>
 					<recursive>true</recursive>
 					<directoryRoots>
-						<directoryRoot>${basedir}/src/main/resources/cggh/</directoryRoot>
+						<directoryRoot>${basedir}/src/main/resources/wrighting/</directoryRoot>
 					</directoryRoots>
-					<templateDirectory>${basedir}/src/jsdoc-templates/cggh</templateDirectory>
+					<templateDirectory>${basedir}/src/jsdoc-templates/wrighting</templateDirectory>
 					<configFile>${basedir}/conf.json</configFile>
 				</configuration>
 			</plugin>
