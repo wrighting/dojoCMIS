@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <title>CmisStore example page</title>
+   <script type="text/javascript">
+        
+            var directory = location.pathname.replace(/\/[^/]+$/, '');
+            d = directory.split('/');
+            d.pop();
+            directory = d.join('/'); 
+            var dojoConfig = {
+               tlmSiblingOfDojo: false,
+               async: true,
+               parseOnLoad: false,
+               packages: [
+                  { name: "dojo", location: directory + '/node_modules/dojo'},
+                  { name: "dijit", location: directory + '/example/js/lib/dijit'},
+                  { name: "dgrid", location: directory + '/target/classes/META-INF/resources/webjars/dgrid/0.3.17'},
+                  { name: "put-selector", location: directory + '/target/classes/META-INF/resources/webjars/put-selector/0.3.5'},
+                  { name: "xstyle", location: directory + '/src/main/resources/xstyle'},
+                  { name: "wrighting", location: directory + '/src/main/resources/wrighting'}
+
+               ]
+            };
+         </script>
+         <script type="text/javascript" src="../node_modules/dojo/dojo.js"></script>
+<style media="screen" type="text/css">
+@import url("js/lib/dijit/themes/claro/claro.css");
+</style>
+	<style>
+		.errorMessage {
+			height: 1em;
+			margin: 1em 2em;
+			padding: 1em 2em;
+
+			background-color: #fcc;
+			color: #900;
+		}
+		.hidden {
+			display: none;
+		}
+	</style>
+<script> 
+
+
+	require(
+			[ "dojo/dom", "wrighting/cmis/CmisGrid", "dojo/domReady!" ],
+			function(dom, CmisGrid) {
+
+				var	targetRoot = "http://localhost:8080/alfresco/api/-default-/public/cmis/versions/1.1/browser";
+				var	testFolder = '/User Homes/admin';
+
+				this.grid = new CmisGrid(
+						{
+							targetRoot : targetRoot,
+							timeout : 10000,
+							query : {
+								/*
+								 'statement' : 'SELECT * FROM cgghPub:publicationFolder ' +
+								 'join cgghPub:publication as p on cmis:objectId = p.cmis:objectId ' + 
+								 'join cm:titled as t on cmis:objectId = t.cmis:objectId',
+								 */
+								path : testFolder
+							},
+							columns : [ {
+								field : "cmis:name",
+								formatter : this.formatLinkFunction
+							}, {
+                                                                parentType: 'cm:titled',
+								field : "cm:title"
+							}, {
+                                                                parentType: 'cm:titled',
+								field : "cm:description"
+							}, {
+								field : "cmis:creationDate"
+							}
+							]
+						});
+				var messageNode = dom.byId('message');
+				this.grid.on('dgrid-error', function(event) {
+				    // Display an error message above the grid when an error occurs.
+				    messageNode.className = 'errorMessage';
+				    messageNode.innerHTML = event.error.message;
+				});
+				this.grid.placeAt("grid-place");
+				this.grid.startup();
+			});
+</script>
+</head>
+
+<body id="Share" class="yui-skin-lightTheme claro alfresco-share">
+<div id="message" class="message hidden"></div>
+<div id="grid-place"></div></td>
+</body>
+</html>

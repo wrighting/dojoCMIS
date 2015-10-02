@@ -15,34 +15,26 @@ define(
                 counter : 0,
 
                 // summary:
-                //		This is a basic store for RESTful communicating with a server through JSON
-                //		formatted data. It implements dojo/store/api/Store.
+                //              This is a basic store for RESTful communicating with a server through JSON
+                //              formatted data. It implements dojo/store/api/Store.
 
                 constructor : function(options) {
                     // summary:
-                    //		This is a basic store for RESTful communicating with a server through JSON
-                    //		formatted data.
+                    //          This is a basic store for RESTful communicating with a server through JSON
+                    //          formatted data.
                     // options: wrighting/cmis/store/CmisStore
-                    //		This provides any configuration information that will be mixed into the store
+                    //          This provides any configuration information that will be mixed into the store
                     declare.safeMixin(this, options);
                     if (!(options.target && typeof options.target != 'undefined')) {
                         this.target = this.base + this.root;
                     }
-                    /* If you want to get Repository properties then this is a good place to do it
-                    var deferred = script.get(this.target + '?cmisselector=properties', {
-                        jsonp : "callback"
-                    });
-                    var results = new Deferred();
-                    deferred.then(function(data) {
-                        //console.log(data);
-                    });
-                    */
+                    
                 },
 
                 // target: String
-                //		The target base URL to use for all requests to the server. This string will be
-                //		prepended to the id to generate the URL (relative or absolute) for requests
-                //		sent to the server
+                //              The target base URL to use for all requests to the server. This string will be
+                //              prepended to the id to generate the URL (relative or absolute) for requests
+                //              sent to the server
                 //              This is base + root
                 target : "",
 
@@ -51,21 +43,21 @@ define(
                 base : "",
 
                 // idProperty: String
-                //		Indicates the property to use as the identity property. The values of this
-                //		property should be unique.
+                //              Indicates the property to use as the identity property. The values of this
+                //              property should be unique.
                 idProperty : "objectId",
 
                 // sortParam: String
-                //		The query parameter to used for holding sort information. If this is omitted, than
-                //		the sort information is included in a functional query token to avoid colliding
-                //		with the set of name/value pairs.
+                //              The query parameter to used for holding sort information. If this is omitted, than
+                //              the sort information is included in a functional query token to avoid colliding
+                //              with the set of name/value pairs.
 
                 // ascendingSuffix: String
-                //		The prefix to apply to sort attribute names that are ascending
+                //              The prefix to apply to sort attribute names that are ascending
                 ascendingSuffix : " ASC",
 
                 // descendingSuffix: String
-                //		The prefix to apply to sort attribute names that are ascending
+                //              The prefix to apply to sort attribute names that are ascending
                 descendingSuffix : " DESC",
 
                 // succinct: boolean
@@ -78,7 +70,7 @@ define(
                 excludeProperties : [
                         'cmis:allowedChildObjectTypeIds', 'cmis:path', 'cmis:creationDate', 'cmis:changeToken', 'cmis:lastModifiedBy',
                         'cmis:createdBy', 'cmis:objectId', 'alfcmis:nodeRef', 'cmis:parentId', 'cmis:secondaryObjectTypeIds',
-                        'cmis:lastModificationDate', 'cmis:baseTypeId', 'cmis:objectTypeId'
+                        'cmis:lastModificationDate', 'cmis:baseTypeId', 'cmis:objectTypeId', 'cmis:isImmutable', 'cmis:isVersionSeriesCheckedOut', 'cmis:versionSeriesId', 'cmis:isLatestMajorVersion', 'cmis:isLatestVersion', 'cmis:versionLabel','cmis:isMajorVersion', 'cmis:contentStreamLength', 'cmis:contentStreamId', 'cmis:contentStreamMimeType', 'cmis:isPrivateWorkingCopy', 'app:editInLine'
                 ],
 
                 // properties allowed by put
@@ -107,6 +99,7 @@ define(
                 queryOptions : {
                     cmisselector : 'children' //(object|properties|children|allowedActions|relationships|renditions|content)
                 },
+                ticket: '',
                 // The number of milliseconds to wait for a response
                 // Due to the nature of jsonp you'll never get an e.g. 404 so to receive an error response it's necessary to timeout
                 timeout : 2000,
@@ -224,6 +217,23 @@ define(
                     return (results);
                 },
 
+                getTypeInfo : function(object) {
+                   var queryParams = '?cmisselector=typeDescendants&depth=-1&includePropertyDefinitions=true';
+
+                    var deferred = script.get(this.base + queryParams, {
+                        jsonp : "callback",
+                        timeout : this.timeout
+                    });
+                    var results = new Deferred();
+                    deferred.then(lang.hitch(this, function(data) {
+                        //console.log(data);
+                        results.resolve(data);
+                    }), function(error) {
+                        results.reject(error);
+                    });
+
+                    return (results);
+                },
                 getIdentity : function(object) {
                     // summary:
                     //          Returns an objects identity
@@ -364,12 +374,12 @@ define(
                 },
                 add : function(object, options) {
                     // summary:
-                    //		Adds an object. This will trigger a POST request to the server
+                    //          Adds an object. This will trigger a POST request to the server
                     // object: Object
-                    //		The object to store.
+                    //          The object to store.
                     // options: 
-                    //		Must contain either a parentId or a parent object as the location in 
-                    //		which to store the new object unless the object is a form and it has a value set for objectId
+                    //          Must contain either a parentId or a parent object as the location in 
+                    //          which to store the new object unless the object is a form and it has a value set for objectId
                     options = options || {};
 
                     //Needs to be the id of the parent
@@ -513,7 +523,11 @@ define(
                     deferred.then(lang.hitch(this, function(data) {
                         console.log("Unexpected success!");
                     }), lang.hitch(this, function error(data) {
-                        //Because the response is json there's always an error (for iframe to work a json response needs to be wrapped in a textarea
+                    	if (data['name'] && data['name'] == 'SecurityError') {
+                    		results.reject(data);
+                    		return;
+                    	}
+                        //Because the response is json there's always an error (for iframe to work a json response needs to be wrapped in a textarea)
                         var queryParams = '?cmisselector=lastResult&token=' + token;
                         var outcome = script.get(this.base + queryParams, {
                             jsonp : "callback",
@@ -552,14 +566,14 @@ define(
 
                 remove : function(id, options) {
                     // summary:
-                    //		Deletes an object by its identity. This will trigger a DELETE request to the server.
+                    //          Deletes an object by its identity. This will trigger a DELETE request to the server.
                     // id: String or Object
-                    //		The identity to use to delete the object
-                    //		String can either be the path or the object Id
+                    //          The identity to use to delete the object
+                    //          String can either be the path or the object Id
                     //      If the id string contains a path separator (/) then will look up by path, otherwise
                     //      uses the object id
                     // options: Object?
-                    //	Can explicit set usePath: true or false
+                    //  Can explicit set usePath: true or false
                     options = options || {};
 
                     var objectData = {};
@@ -594,10 +608,10 @@ define(
                 },
                 query : function(queryParams, options) {
                     // summary:
-                    //		Queries the store for objects. This will trigger a GET request to the server, with the
-                    //		query added as a query string.
+                    //          Queries the store for objects. This will trigger a GET request to the server, with the
+                    //          query added as a query string.
                     // query: Object
-                    //		The query to use for retrieving objects from the store.
+                    //          The query to use for retrieving objects from the store.
                     //              This can include a CMIS query like "SELECT * FROM cmis:document"
                     //              searchAllVersions
                     //              includeRelationships
@@ -605,9 +619,9 @@ define(
                     //              
                     //              
                     // options: __QueryOptions?
-                    //		The optional arguments to apply to the resultset.
+                    //          The optional arguments to apply to the resultset.
                     // returns: dojo/store/api/Store.QueryResults
-                    //		The results of the query, extended with iterative methods.
+                    //          The results of the query, extended with iterative methods.
                     options = options || {};
 
                     queryParams = queryParams || '';
@@ -631,7 +645,7 @@ define(
                             requestURL = this.base;
                         }
                         optionsParams = xhr.objectToQuery(newOptions);
-                        queryParams = (hasQuestionMark ? "&" : "?") + optionsParams;
+                        queryParams += (hasQuestionMark ? "&" : "?") + optionsParams;
                     } else {
                         //queryParams should be a string
                         var sep = '&';
@@ -676,6 +690,11 @@ define(
                         queryParams += (queryParams || hasQuestionMark ? "&" : "?") + "succinct=true";
                     }
 
+                    if (this.ticket != '') {
+                        hasQuestionMark = queryParams.indexOf("?") > -1;
+                        queryParams += (queryParams || hasQuestionMark ? "&" : "?") + "alf_ticket=" + this.ticket;
+                    }
+                    
                     var deferred = script.get(requestURL + (queryParams || ""), {
                         jsonp : "callback",
                         timeout : this.timeout
