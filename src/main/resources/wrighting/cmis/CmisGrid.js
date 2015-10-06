@@ -21,12 +21,9 @@ define(
 						timeout: 1000,
 						types: {},
 						excludeFields: [ ],
-						// targetRoot =
-							// "https://localhost:8443/alfresco/api/-default-/public/cmis/versions/1.1/browser",
-							// This isn't right but I don't know what is -
-						// targetRoot = Alfresco.constants.PROXY_URI +
+						// targetRoot : Alfresco.constants.PROXY_URI + /alfresco-api/-default-/public/cmis/versions/1.1/browser
 						// "/cmis/versions/1.1/browser";
-						targetRoot : "/alfresco/api/-default-/public/cmis/versions/1.1/browser",
+						targetRoot : "http://localhost:8080/share/proxy/alfresco-api/-default-/public/cmis/versions/1.1/browser",
 						buildRendering : function wrighting_grid_buildRendering() {
 							this.inherited(arguments);
 						},
