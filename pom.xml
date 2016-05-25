@@ -185,6 +185,8 @@
 								<exclude>**/site-webscripts/**</exclude>
 								<exclude>**/*.lib.js</exclude>
 								<exclude>**/*.css</exclude>
+								<exclude>**/*-min.js</exclude>
+								<exclude>**/*-min.css</exclude>
 							</excludes>
 							<warSourceDirectory>src/main/resources/META-INF</warSourceDirectory>
 							<jswarn>false</jswarn>
