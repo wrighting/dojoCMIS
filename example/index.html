@@ -48,7 +48,8 @@
 			function(dom, CmisGrid) {
 
 				var	targetRoot = "http://localhost:8080/share/proxy/alfresco-api/-default-/public/cmis/versions/1.1/browser";
-				var	testFolder = '/User Homes/admin';
+				//var	testFolder = '/User Homes/admin';
+				var	testFolder = '/sites/test-site/documentLibrary/Test';
 
 				this.grid = new CmisGrid(
 						{
@@ -63,6 +64,7 @@
 								path : testFolder
 							},
 							columns : [ {
+								parentType: 'cmis:item',
 								field : "cmis:name",
 								formatter : this.formatLinkFunction
 							}, {
@@ -72,6 +74,10 @@
                                                                 parentType: 'cm:titled',
 								field : "cm:description"
 							}, {
+								parentType: 'cmis:item',
+  							        "field" : "cmis:createdBy"
+						        },{
+								parentType: 'cmis:item',
 								field : "cmis:creationDate"
 							}
 							]

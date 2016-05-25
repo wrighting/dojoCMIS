@@ -70,7 +70,7 @@ define(
                 excludeProperties : [
                         'cmis:allowedChildObjectTypeIds', 'cmis:path', 'cmis:creationDate', 'cmis:changeToken', 'cmis:lastModifiedBy',
                         'cmis:createdBy', 'cmis:objectId', 'alfcmis:nodeRef', 'cmis:parentId', 'cmis:secondaryObjectTypeIds',
-                        'cmis:lastModificationDate', 'cmis:baseTypeId', 'cmis:objectTypeId', 'cmis:isImmutable', 'cmis:isVersionSeriesCheckedOut', 'cmis:versionSeriesId', 'cmis:isLatestMajorVersion', 'cmis:isLatestVersion', 'cmis:versionLabel','cmis:isMajorVersion', 'cmis:contentStreamLength', 'cmis:contentStreamId', 'cmis:contentStreamMimeType', 'cmis:isPrivateWorkingCopy', 'app:editInLine'
+                        'cmis:lastModificationDate', 'cmis:baseTypeId', 'cmis:objectTypeId', 'cmis:isImmutable', 'cmis:isVersionSeriesCheckedOut', 'cmis:versionSeriesId', 'cmis:isLatestMajorVersion', 'cmis:isLatestVersion', 'cmis:versionLabel','cmis:isMajorVersion', 'cmis:contentStreamLength', 'cmis:contentStreamId', 'cmis:contentStreamMimeType', 'cmis:isPrivateWorkingCopy', 'app:editInLine', 'app:editInline', 'cm:lastThumbnailModification'
                 ],
 
                 // properties allowed by put

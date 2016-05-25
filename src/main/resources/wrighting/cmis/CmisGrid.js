@@ -112,21 +112,31 @@ define(
 										var parentType = col['parentType'];
 										var propName = col['field'];
 										var found = false;
-										array.forEach(this.types, function(child) {
-											if (child['type'] && child['type']['queryName'] == "cmis:secondary") {
-												array.forEach(child['children'], function(typeDef) {
-													var defn = this.parseDefinition(typeDef, parentType, propName, col);
-													if (defn) {
-														cols.push(defn);
+										var defn = col;
+										array.some(this.types, function(child) {
+											if (child['type']) { // && child['type']['queryName'] == "cmis:secondary") {
+												var def = this.parseDefinition(child, parentType, propName, col);
+												if (def) {
+													defn = def;
+													found = true;
+													return (found);
+												}
+												array.some(child['children'], function(typeDef) {
+													var def = this.parseDefinition(typeDef, parentType, propName, col);
+													if (def) {
+														defn = def;
 														found = true;
+														return (found);
 													}
 												}, this); //end foreach typedef
-											} //end cmis:secondary
+											} //end 
+											return (found);
 										} //end forEach columns
 
 										, this);  // End types loop
-										if (!found) {
-											cols.push(col);
+										cols.push(defn);
+										if (defn["editorArgs"] && defn["editorArgs"]["readonly"] != "readonly") {
+											this.cmisStore.allowedProperties.push(propName);
 										}
 									}, this);  // end columns loop
 
