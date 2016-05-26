@@ -9,9 +9,9 @@
              <web-framework>
                 <dojo-pages>
                   <packages>
-                    <package name="wrighting" location="js/dojoCMIS/1.0.0/wrighting"/>
-                    <package name="dgrid" location="resources/webjars/dgrid/0.3.17"/>
-                    <package name="put-selector" location="resources/webjars/put-selector/0.3.5"/>
+                    <package name="wrighting" location="js/dojoCMIS/${project.version}/wrighting"/>
+                    <package name="dgrid" location="resources/webjars/dgrid/${dependency.dgrid.version}"/>
+                    <package name="put-selector" location="resources/webjars/put-selector/${dependency.put-selector.version}"/>
                     <package name="xstyle" location="js/lib/xstyle"/>
                   </packages>
                </dojo-pages>
