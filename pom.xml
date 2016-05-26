@@ -41,18 +41,24 @@
 				<directory>${basedir}</directory>
 			</resource>
 
-         <resource>
-            <!-- Path has to be aligned with version because Surf caches by XML path -->
-            <targetPath>./alfresco/site-data/extensions/${project.version}</targetPath>
-            <filtering>true</filtering>
-            <directory>${basedir}/src/main/resources/extension-module</directory>
-         </resource>
+			<resource>
+			    <!-- Path has to be aligned with version because Surf caches by XML path -->
+			    <targetPath>./alfresco/site-data/extensions/${project.version}</targetPath>
+			    <filtering>true</filtering>
+			    <directory>${basedir}/src/main/resources/extension-module</directory>
+			</resource>
 
 			<resource>
 				<targetPath>META-INF/js/lib/xstyle</targetPath>
 				<filtering>false</filtering>
 				<directory>${basedir}/src/main/resources/xstyle</directory>
 			</resource>
+                        <resource>
+                                <targetPath>META-INF</targetPath>
+                                <filtering>false</filtering>
+                                <directory>${basedir}/src/main/resources/META-INF</directory>
+                        </resource>
+
 			<!-- ...but everything else goes into a standard path -->
 			<resource>
 				<targetPath>META-INF/js/lib</targetPath>
