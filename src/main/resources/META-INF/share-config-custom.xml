@@ -1,0 +1,11 @@
+<alfresco-config>
+
+<!-- Document Library config section -->
+<config evaluator="string-compare" condition="DocumentLibrary">
+	<types>
+		<type name="cm:content">
+			<subtype name="surf:amdpage"/>
+		</type>
+	</types>
+</config>
+</alfresco-config>
