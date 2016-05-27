@@ -18,8 +18,10 @@ define(
 						templateString : '<div data-dojo-attach-point="wrighting_grid"></div>',
 						query :  '/root',
 						columns: [],
+						configured: false,
 						timeout: 1000,
 						types: {},
+						loggingEnabled: true,
 						excludeFields: [ ],
 						// targetRoot : Alfresco.constants.PROXY_URI + /alfresco-api/-default-/public/cmis/versions/1.1/browser
 						// "/cmis/versions/1.1/browser";
@@ -34,9 +36,6 @@ define(
 									found = true;
 									defn = { label: propDef['displayName'] };
 									defn['field'] = col['field'];
-									if (col['formatter']) {
-										defn['formatter'] = col['formatter'];
-									}
 									defn['editorArgs'] = { options: [] };
 									if (propDef['updatability'] == 'readwrite') {
 										defn['autoSave'] = true;
@@ -44,6 +43,10 @@ define(
 										defn['editorArgs']['readonly'] = 'readonly';
 										defn['editorArgs']['disabled'] = 'disabled';
                                                                                 this.excludeFields.push(propName);
+									}
+									if (col['formatter']) {
+										defn['formatter'] = col['formatter'];
+										return (defn);
 									}
 
 									if (propDef['choice']) {
@@ -92,6 +95,20 @@ define(
 								}
 							}
 						},
+						_log : function wrighting_grid_log(level, message) {
+							if (this.loggingEnabled) {
+								console.log(level + ":" + message);
+							}
+						},
+						createGrid: function function_wrighting_grid_createGrid() {
+							this.grid = new dgrid(
+									{
+										store : this.cmisStore,
+										query: this.query,
+										columns : this.columns
+									}, this.wrighting_grid);
+							this.grid.startup();
+						},
 						postCreate : function wrighting_grid_postCreate() {
 							try {
 
@@ -101,63 +118,70 @@ define(
 									timeout : this.timeout
 
 								});
-								var info = this.cmisStore.getTypeInfo();
-								info.then(lang.hitch(this, function(data) {
-									this.types = data;
+								if (this.configured) {
+									this.createGrid();
+								} else {
+									this.defineColumns();
+								}
+							} catch (err) {
+								this._log("error", err);
+							}
+						},
+						defineColumns : function wrighting_grid_defineColumns() {
+							
+							var info = this.cmisStore.getTypeInfo();
+							info.then(lang.hitch(this, function(data) {
+								var cols = [];
+								this.types = data;
+								
+								this._log("log", "Configured columns:" + JSON.stringify(this.columns));
 
-
-									var cols = [];
-
-									array.forEach(this.columns, function(col) {
-										var parentType = col['parentType'];
-										var propName = col['field'];
-										var found = false;
-										var defn = col;
-										array.some(this.types, function(child) {
-											if (child['type']) { // && child['type']['queryName'] == "cmis:secondary") {
-												var def = this.parseDefinition(child, parentType, propName, col);
+								array.forEach(this.columns, function(col) {
+									var parentType = col['parentType'];
+									var propName = col['field'];
+									var found = false;
+									var defn = col;
+									array.some(this.types, function(child) {
+										if (child['type']) { // && child['type']['queryName'] == "cmis:secondary") {
+											var def = this.parseDefinition(child, parentType, propName, col);
+											if (def) {
+												defn = def;
+												found = true;
+												return (found);
+											}
+											array.some(child['children'], function(typeDef) {
+												var def = this.parseDefinition(typeDef, parentType, propName, col);
 												if (def) {
 													defn = def;
 													found = true;
 													return (found);
 												}
-												array.some(child['children'], function(typeDef) {
-													var def = this.parseDefinition(typeDef, parentType, propName, col);
-													if (def) {
-														defn = def;
-														found = true;
-														return (found);
-													}
-												}, this); //end foreach typedef
-											} //end 
-											return (found);
-										} //end forEach columns
+											}, this); //end foreach typedef
+										} //end 
+										return (found);
+									} //end forEach columns
 
-										, this);  // End types loop
-										cols.push(defn);
-										if (defn["editorArgs"] && defn["editorArgs"]["readonly"] != "readonly") {
-											this.cmisStore.allowedProperties.push(propName);
-										}
-									}, this);  // end columns loop
+									, this);  // End types loop
+									cols.push(defn);
+									if (defn["editorArgs"] && defn["editorArgs"]["readonly"] != "readonly") {
+										this.cmisStore.allowedProperties.push(propName);
+									}
+								}, this);  // end columns loop
 
-									//Fields to excluded when doing an update
-									array.forEach(this.excludeFields, lang.hitch(this, function(exclude) {
-										this.cmisStore.excludeProperties.push(exclude);
-									}));
+								//Fields to excluded when doing an update
+								array.forEach(this.excludeFields, lang.hitch(this, function(exclude) {
+									this.cmisStore.excludeProperties.push(exclude);
+								}));
 
+								this._log("log", "Processed columns:" + JSON.stringify(cols));
+								this.columns = cols;
 
-									this.grid = new dgrid(
-											{
-												store : this.cmisStore,
-												query: this.query,
-												columns : cols
-											}, this.wrighting_grid);
-									this.grid.startup();
-								}), function(err) {
-									console.log(err);
-								});
-							} catch (err) {
-								console.log(err);
+								this.createGrid();
+							}), lang.hitch(this, function(err) {
+								this._log("error", err);
+								}));
+							if (info.isRejected() || info.isCanceled()) {
+								this._log("error", "Cancelled or rejected");
 							}
 
 						},

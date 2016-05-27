@@ -5,6 +5,8 @@ define(["dojo/_base/declare",
         "alfresco/core/Core",
         "wrighting/cmis/CmisGrid"], function(declare, _Widget, _Templated, template, Core, CmisGrid) {
    return declare([_Widget, _Templated, Core, CmisGrid], {
-//Not actually doing anything apart from adding Core
+		_log : function wrighting_log(level, message) {
+			this.alfLog(level, message);
+		}
       })
 });
