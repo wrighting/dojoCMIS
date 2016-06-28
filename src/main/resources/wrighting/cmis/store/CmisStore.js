@@ -1,9 +1,12 @@
 define(
         [
-                "module", "dojo/_base/xhr", "dojo/request/script", "dojo/request/iframe", "dojo/Deferred", "dojo/_base/lang", "dojo/query",
-                "dojo/dom-attr", "dojo/dom-construct", "dojo/json", "dojo/_base/declare", "dojo/store/util/QueryResults" /*=====, "./api/Store" =====*/
+                "module", "dojo/_base/xhr", "dojo/request/script", "dojo/request/iframe", "dojo/Deferred", 
+                "dojo/_base/lang", "dojo/query", "dojo/dom-attr", "dojo/dom-construct", "dojo/json",
+                "dojo/_base/declare", "dojo/store/util/QueryResults" /*=====, "./api/Store" =====*/
         ],
-        function(module, xhr, script, iframe, Deferred, lang, query, domAttr, domConstruct, JSON, declare, QueryResults /*=====, Store =====*/) {
+        function(module, xhr, script, iframe, Deferred, 
+        		lang, query, domAttr, domConstruct, JSON,
+        		declare, QueryResults /*=====, Store =====*/) {
 
             // No base class, but for purposes of documentation, the base class is dojo/store/api/Store
             var base = null;
@@ -70,7 +73,10 @@ define(
                 excludeProperties : [
                         'cmis:allowedChildObjectTypeIds', 'cmis:path', 'cmis:creationDate', 'cmis:changeToken', 'cmis:lastModifiedBy',
                         'cmis:createdBy', 'cmis:objectId', 'alfcmis:nodeRef', 'cmis:parentId', 'cmis:secondaryObjectTypeIds',
-                        'cmis:lastModificationDate', 'cmis:baseTypeId', 'cmis:objectTypeId', 'cmis:isImmutable', 'cmis:isVersionSeriesCheckedOut', 'cmis:versionSeriesId', 'cmis:isLatestMajorVersion', 'cmis:isLatestVersion', 'cmis:versionLabel','cmis:isMajorVersion', 'cmis:contentStreamLength', 'cmis:contentStreamId', 'cmis:contentStreamMimeType', 'cmis:isPrivateWorkingCopy', 'app:editInLine', 'app:editInline', 'cm:lastThumbnailModification'
+                        'cmis:lastModificationDate', 'cmis:baseTypeId', 'cmis:objectTypeId', 'cmis:isImmutable', 
+                        'cmis:isVersionSeriesCheckedOut', 'cmis:versionSeriesId', 'cmis:isLatestMajorVersion', 'cmis:isLatestVersion', 'cmis:versionLabel','cmis:isMajorVersion', 
+                        'cmis:contentStreamLength', 'cmis:contentStreamId', 'cmis:contentStreamMimeType','cmis:contentStreamFileName', 
+                        'cmis:isPrivateWorkingCopy', 'app:editInLine', 'app:editInline', 'cm:lastThumbnailModification'                       
                 ],
 
                 // properties allowed by put
@@ -119,6 +125,46 @@ define(
                     return (usePath);
                 },
 
+                _doGet: function(url, params, functionOK, functionError) {
+                	// summary:
+                    //              Makes a GET request to the server.
+                	//				Allows overriding e.g. to allow use of Aikau CoreXhr.serviceXhr
+                    //              
+                    // id: String
+                    //              The identity to use to lookup the object If the id
+                    //              string contains a path separator (/) then will look up by
+                    //              path, otherwise uses the object id
+                    // options: Object
+                    //              Can explicit set usePath: true or false
+                    // returns:
+                    //              {dojo/_base/Deferred}
+                	               		  
+                    var deferred = script.get(url, params);
+                    
+                    var results = new Deferred();
+                    deferred.then(lang.hitch(this, functionOK), functionError);
+
+                    if (params.total) {
+                    	results.total = deferred.then(function(response) {
+                    		var total = 0;
+                    		var s = typeof response;
+                    		if (s === 'object') {
+                    			if (response) {
+                    				if (Object.prototype.toString.call(response) == '[object Array]') {
+                    					total = response.length;
+                    				} else {
+                    					total = response.numItems;
+                    				}
+                    			}
+                    		}
+                    		//console.log("Number of results:" + total);
+                    		return total;
+                    	});
+                    }
+                    return results;
+                	
+                	
+                },
                 get : function(id, options) {
                     // summary:
                     //              Retrieves an object by its identity. This will trigger a (jsonp) GET
@@ -151,14 +197,14 @@ define(
                         queryParams += "&succinct=true";
                     }
 
-                    var deferred = script.get(this.target + (queryParams || ""), {
+                    var results = this._doGet(this.target + (queryParams || ""), {
                         jsonp : "callback",
                         timeout : this.timeout
-                    });
-                    var results = new Deferred();
-                    deferred.then(lang.hitch(this, function(data) {
+                    }, function(data){
                         results.resolve(this._modifyQueryResponse(data));
-                    }));
+                    }, function(error) {
+                        results.reject(error);
+                    });
 
                     return (results);
                 },
@@ -202,15 +248,12 @@ define(
                         queryParams += "&succinct=true";
                     }
 
-                    var deferred = script.get(this.target + (queryParams || ""), {
+                    var results = this._doGet(this.target + (queryParams || ""), {
                         jsonp : "callback",
                         timeout : this.timeout
-                    });
-                    var results = new Deferred();
-                    deferred.then(lang.hitch(this, function(data) {
-                        //console.log(data);
+                    }, function(data) {
                         results.resolve(this._modifyQueryResponse(data));
-                    }), function(error) {
+                    }, function(error) {
                         results.reject(error);
                     });
 
@@ -220,15 +263,12 @@ define(
                 getTypeInfo : function(object) {
                    var queryParams = '?cmisselector=typeDescendants&depth=-1&includePropertyDefinitions=true';
 
-                    var deferred = script.get(this.base + queryParams, {
+                    var results = this._doGet(this.base + queryParams, {
                         jsonp : "callback",
                         timeout : this.timeout
-                    });
-                    var results = new Deferred();
-                    deferred.then(lang.hitch(this, function(data) {
-                        //console.log(data);
+                    }, function(data){
                         results.resolve(data);
-                    }), function(error) {
+                    }, function(error) {
                         results.reject(error);
                     });
 
@@ -351,6 +391,9 @@ define(
                                 value = properties[key];
                             } else {
                                 value = properties[key].value;
+                            }
+                            if (key in object) {
+                            	value = object[key];
                             }
                             //Sometimes null (== "") causes problems e.g. datetime
                             if (value != null) {
@@ -529,10 +572,10 @@ define(
                     	}
                         //Because the response is json there's always an error (for iframe to work a json response needs to be wrapped in a textarea)
                         var queryParams = '?cmisselector=lastResult&token=' + token;
-                        var outcome = script.get(this.base + queryParams, {
+                        var outcome = this._doGet(this.base + queryParams, {
                             jsonp : "callback",
                             timeout : this.timeout
-                        }).then(lang.hitch(this, function(data) {
+                        }, function(data) {
 
                             if (data.code && data.code >= 200 && data.code <= 300) {
                                 //Likely 200 - OK or 201 - created
@@ -558,7 +601,7 @@ define(
                                 results.resolve(data);
                             }
 
-                        }));
+                        });
                     }));
                     return results;
 
@@ -695,15 +738,13 @@ define(
                         queryParams += (queryParams || hasQuestionMark ? "&" : "?") + "alf_ticket=" + this.ticket;
                     }
                     
-                    var deferred = script.get(requestURL + (queryParams || ""), {
-                        jsonp : "callback",
-                        timeout : this.timeout
-                    });
-
-                    // Created a new deferred object and resolving it once
-                    // the XHR deferred resolves
                     var results = new Deferred();
-                    deferred.then(lang.hitch(this, function(data) {
+                    
+                    this._doGet(requestURL + (queryParams || ""), {
+                        jsonp : "callback",
+                        timeout : this.timeout,
+                        total: true
+                    }, function(data) {
                         //console.log(data);
                         var objects = data.objects;
                         var newData = [];
@@ -726,24 +767,11 @@ define(
                         }
                         //console.log(newData);
                         results.resolve(newData);
-                    }));
-
-                    results.total = deferred.then(function(response) {
-                        var total = 0;
-                        var s = typeof response;
-                        if (s === 'object') {
-                            if (response) {
-                                if (Object.prototype.toString.call(response) == '[object Array]') {
-                                    total = response.length;
-                                } else {
-                                    total = response.numItems;
-                                }
-                            }
-                        }
-                        //console.log("Number of results:" + total);
-                        return total;
+                    }, function(error) {
+                        results.reject(error);
                     });
 
+ 
                     return QueryResults(results);
                 },
                 /**

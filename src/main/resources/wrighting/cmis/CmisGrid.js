@@ -53,7 +53,11 @@ define(
                             //          dgrid column definition
                             var defn = { label: col['label'] };
                             defn['field'] = col['field'];
-                            defn['editorArgs'] = col['editorArgs'];
+                            if ('editorArgs' in col) {
+                            	defn['editorArgs'] = col['editorArgs'];
+                            } else {
+                            	defn['editorArgs'] = {};
+                            }   
                             if ("formatter" in col) {
                                 defn['formatter'] = col['formatter'];
                                 return (defn);
@@ -188,15 +192,19 @@ define(
                                     }, this.wrighting_grid);
                             this.grid.startup();
                         },
+                        _getStore: function wrighting_getStore() {
+                            this.cmisStore = new CmisStore({
+                                base : this.targetRoot,
+                                succinct : true,
+                                timeout : this.timeout
+
+                            });
+                        	
+                        },
                         postCreate : function wrighting_grid_postCreate() {
                             try {
-
-                                this.cmisStore = new CmisStore({
-                                    base : this.targetRoot,
-                                    succinct : true,
-                                    timeout : this.timeout
-
-                                });
+                            	this._getStore();
+                            	
                                 if (this.configured) {
                                     this.createGrid();
                                 } else {
