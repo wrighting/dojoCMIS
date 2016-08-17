@@ -11,8 +11,7 @@
                   <packages>
                     <package name="wrighting" location="js/dojoCMIS/${project.version}/wrighting"/>
                     <package name="dgrid" location="resources/webjars/dgrid/${dependency.dgrid.version}"/>
-                    <package name="put-selector" location="resources/webjars/put-selector/${dependency.put-selector.version}"/>
-                    <package name="xstyle" location="js/lib/xstyle"/>
+                    <package name="dstore" location="resources/webjars/dstore/${dependency.dstore.version}"/>
                   </packages>
                </dojo-pages>
              </web-framework>

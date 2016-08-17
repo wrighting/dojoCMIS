@@ -6,15 +6,15 @@
 	<groupId>org.wrighting</groupId>
 	<artifactId>dojoCMIS</artifactId>
 	<name>dojoCMIS</name>
-	<version>1.1.0-SNAPSHOT</version>
+	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<description>Contains the dojoCMIS code together with dgrid for convenience</description>
 
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<dependency.dgrid.version>0.3.17</dependency.dgrid.version>
-		<dependency.put-selector.version>0.3.5</dependency.put-selector.version>
+		<dependency.dgrid.version>1.1.0</dependency.dgrid.version>
+		<dependency.dstore.version>1.1.1</dependency.dstore.version>
 	</properties>
 
 	<build>
@@ -48,11 +48,6 @@
 			    <directory>${basedir}/src/main/resources/extension-module</directory>
 			</resource>
 
-			<resource>
-				<targetPath>META-INF/js/lib/xstyle</targetPath>
-				<filtering>false</filtering>
-				<directory>${basedir}/src/main/resources/xstyle</directory>
-			</resource>
                         <resource>
                                 <targetPath>META-INF</targetPath>
                                 <filtering>false</filtering>
@@ -105,19 +100,24 @@
 						<configuration>
 							<artifactItems>
 								<artifactItem>
-									<groupId>org.webjars</groupId>
+									<groupId>org.webjars.bower</groupId>
 									<artifactId>dgrid</artifactId>
 									<version>${dependency.dgrid.version}</version>
 									<overWrite>true</overWrite>
 									<outputDirectory>${basedir}/target/classes</outputDirectory>
-									<excludes>**/META-INF/resources/webjars/dgrid/0.3.17/test/**</excludes>
+									<excludes>**/META-INF/resources/webjars/dgrid/${dependency.dgrid.version}/test/**</excludes>
+									<excludes>**/META-INF/resources/webjars/dgrid/${dependency.dgrid.version}/doc/**</excludes>
+									<excludes>**/META-INF/resources/webjars/dgrid/${dependency.dgrid.version}/demos/**</excludes>
 								</artifactItem>
 								<artifactItem>
-									<groupId>org.webjars</groupId>
-									<artifactId>put-selector</artifactId>
-									<version>${dependency.put-selector.version}</version>
+									<groupId>org.webjars.bower</groupId>
+									<artifactId>dstore</artifactId>
+									<version>${dependency.dstore.version}</version>
 									<overWrite>true</overWrite>
 									<outputDirectory>${basedir}/target/classes</outputDirectory>
+									<excludes>**/META-INF/resources/webjars/dstore/${dependency.dstore.version}/test/**</excludes>
+									<excludes>**/META-INF/resources/webjars/dstore/${dependency.dstore.version}/doc/**</excludes>
+									<excludes>**/META-INF/resources/webjars/dstore/${dependency.dstore.version}/demos/**</excludes>
 								</artifactItem>
 							</artifactItems>
 						</configuration>

@@ -3,19 +3,19 @@ define(
          "dojo/_base/array", // array.forEach
          "dojo/_base/declare", "dojo/_base/lang", "dijit/_WidgetBase", "dijit/_TemplatedMixin", "dojo/dom", "dojo/dom-construct",
          "wrighting/cmis/store/CmisStore","wrighting/cmis/ModelMultiSelect", 
-         "dgrid/OnDemandGrid", "dgrid/editor", "dijit/form/MultiSelect", "dijit/form/Select",
-         "dijit/form/DateTextBox"
+         "dgrid/OnDemandGrid", "dgrid/Editor", "dijit/form/MultiSelect", "dijit/form/Select",
+         "dijit/form/DateTextBox", 'dstore/legacy/StoreAdapter'
          ],
          function(array, declare, lang, _Widget, _Templated, dom, domConstruct, 
                  CmisStore, ModelMultiSelect,
-                 dgrid, editor, MultiSelect, Select, DateTextBox) {
+                 dgrid, Editor, MultiSelect, Select, DateTextBox, StoreAdapter) {
 
             return declare(
                     [
                      _Widget, _Templated
                      ],
                      {
-                        templateString : '<div data-dojo-attach-point="wrighting_grid"></div>',
+                        templateString : '<div><div id="message" class="message hidden"></div><div data-dojo-attach-point="wrighting_grid"></div></div>',
                         query :  '/root',
                         columns: [],
                         configured: false,
@@ -77,14 +77,16 @@ define(
                             }
                             if ("editorArgs" in col && col['editorArgs'].options.length > 0) {
                                 if (col['cardinality'] == 'multi') {
-                                    return(editor(defn,ModelMultiSelect));
+                                    defn['editor'] = ModelMultiSelect;
+                                    return(defn);
                                 } else {
-                                    return(editor(defn,Select));
+                                    defn['editor'] = Select;
+                                    return(defn);
                                 }
                             }
                             if (col['propertyType'] == 'boolean') {
                                 defn['editor'] = "checkbox";
-                                return(editor(defn));
+                                return(defn);
                             }
                             if (col['propertyType'] == 'datetime') {
                                 defn['get'] = function(rowData) {
@@ -105,10 +107,12 @@ define(
                                         return null;
                                     }
                                 };
-                                return(editor(defn, DateTextBox));
+                                defn['editor'] = DateTextBox;
+                                return(defn);
                             }
                             if (col['propertyType'] == 'string') {
-                                return(editor(defn));
+                                defn['editor'] = "text";
+                                return(defn);
                             }
 
                             return defn;
@@ -182,14 +186,28 @@ define(
                             //Fields to excluded when doing an update
                             array.forEach(this.excludeFields, lang.hitch(this, function(exclude) {
                                 this.cmisStore.excludeProperties.push(exclude);
-                            }));
-                            this.grid = new dgrid(
+			    }));
+			    var adaptedStore = new StoreAdapter({objectStore: this.cmisStore});
+                            this.grid = new (declare([dgrid,Editor]))(
                                     {
-                                        store : this.cmisStore,
-                                        query: this.query,
+                                        collection : adaptedStore.filter(this.query),
                                         pageContext: this.pageContext,
                                         columns : cols
-                                    }, this.wrighting_grid);
+				    }, this.wrighting_grid);
+                            var messageNode = dom.byId('message');
+                            this.grid.on('dgrid-error', function(event) {
+                                // Display an error message above the grid when an error occurs.
+                                messageNode.className = 'errorMessage';
+                                messageNode.innerHTML = event.error.message;
+                            });
+				 
+                            this.grid.on('dgrid-refresh-complete', function(event) {
+                                // Hide any previous error message when a refresh
+                                // completes successfully.
+                                messageNode.className = 'errorMessage hidden';
+                                messageNode.innerHTML = '';
+                            });
+                            
                             this.grid.startup();
                         },
                         _getStore: function wrighting_getStore() {

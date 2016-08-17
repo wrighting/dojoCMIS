@@ -15,14 +15,14 @@
                packages: [
                   { name: "dojo", location: directory + '/node_modules/dojo'},
                   { name: "dijit", location: directory + '/example/js/lib/dijit'},
-                  { name: "dgrid", location: directory + '/target/classes/META-INF/resources/webjars/dgrid/0.3.17'},
-                  { name: "put-selector", location: directory + '/target/classes/META-INF/resources/webjars/put-selector/0.3.5'},
-                  { name: "xstyle", location: directory + '/src/main/resources/xstyle'},
+                  { name: "dgrid", location: directory + '/target/classes/META-INF/resources/webjars/dgrid/1.1.0'},
+                  { name: "dstore", location: directory + '/target/classes/META-INF/resources/webjars/dstore/1.1.1'},
                   { name: "wrighting", location: directory + '/src/main/resources/wrighting'}
 
                ]
             };
-         </script>
+   </script>
+   <link rel="stylesheet" href="../target/classes/META-INF/resources/webjars/dgrid/1.1.0/css/dgrid.css">
          <script type="text/javascript" src="../node_modules/dojo/dojo.js"></script>
 <style media="screen" type="text/css">
 @import url("js/lib/dijit/themes/claro/claro.css");
@@ -85,12 +85,6 @@
 							}
 							]
 						});
-				var messageNode = dom.byId('message');
-				this.grid.on('dgrid-error', function(event) {
-				    // Display an error message above the grid when an error occurs.
-				    messageNode.className = 'errorMessage';
-				    messageNode.innerHTML = event.error.message;
-				});
 				this.grid.placeAt("grid-place");
 				this.grid.startup();
 			});
@@ -98,7 +92,6 @@
 </head>
 
 <body id="Share" class="yui-skin-lightTheme claro alfresco-share">
-<div id="message" class="message hidden"></div>
 <div id="grid-place"></div></td>
 </body>
 </html>

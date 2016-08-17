@@ -675,7 +675,8 @@ define(
                     //query object is converted to a list of parameters
                     if (queryParams && typeof queryParams == "object") {
                         var newOptions = lang.clone(this.queryOptions);
-                        lang.mixin(newOptions, queryParams);
+			lang.mixin(newOptions, queryParams);
+			queryParams = '';
                         if (typeof newOptions.path != "undefined") {
                             var usePath = this._usePath(newOptions.path, options);
                             if (usePath) {
