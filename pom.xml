@@ -6,7 +6,7 @@
 	<groupId>org.wrighting</groupId>
 	<artifactId>dojoCMIS</artifactId>
 	<name>dojoCMIS</name>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<packaging>jar</packaging>
 	<description>Contains the dojoCMIS code together with dgrid for convenience</description>
 
