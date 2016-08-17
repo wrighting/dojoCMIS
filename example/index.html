@@ -47,7 +47,10 @@
 			[ "dojo/dom", "wrighting/cmis/CmisGrid", "dojo/domReady!" ],
 			function(dom, CmisGrid) {
 
-				var	targetRoot = "http://localhost:8080/share/proxy/alfresco-api/-default-/public/cmis/versions/1.1/browser";
+				//The share proxy URL is *probably* the better one to use, due to setting up authentication
+				//however, as of 5.1.g, you can't use it for updates
+//				var	targetRoot = "http://localhost:8080/share/proxy/alfresco-api/-default-/public/cmis/versions/1.1/browser";
+				var	targetRoot = "http://localhost:8080/alfresco/api/-default-/public/cmis/versions/1.1/browser";
 				//var	testFolder = '/User Homes/admin';
 				var	testFolder = '/sites/test-site/documentLibrary/Test';
 
@@ -56,9 +59,9 @@
 							targetRoot : targetRoot,
 							timeout : 10000,
 							query : {
-								/*
-								 'statement' : 'SELECT * FROM cgghPub:publicationFolder ' +
-								 'join cgghPub:publication as p on cmis:objectId = p.cmis:objectId ' + 
+								/* Example statement - it's better to enumerate the fields rather than using *
+								 'statement' : 'SELECT * FROM myns:mytype ' +
+								 'join myns:mytype as p on cmis:objectId = p.cmis:objectId ' + 
 								 'join cm:titled as t on cmis:objectId = t.cmis:objectId',
 								 */
 								path : testFolder
