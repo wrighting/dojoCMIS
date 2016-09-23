@@ -367,6 +367,16 @@ define(
                             delete properties[key];
                         }
                     }
+                    for ( var key in object) {
+                        //If the object was created via a CMIS query it could be of the form t.cm:title
+                        //in which case we want to remove the t.
+                        var alias = key.indexOf('.');
+                        if (alias > -1) {
+                            var noaliaskey = key.substr(alias + 1)
+                            object[noaliaskey] = object[key];
+                            delete object[key];
+                        }
+                    }
                     for ( var key in properties) {
 
                         var update = this.putExclude;
