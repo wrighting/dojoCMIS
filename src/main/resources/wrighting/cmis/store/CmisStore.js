@@ -76,7 +76,8 @@ define(
                         'cmis:lastModificationDate', 'cmis:baseTypeId', 'cmis:objectTypeId', 'cmis:isImmutable', 
                         'cmis:isVersionSeriesCheckedOut', 'cmis:versionSeriesId', 'cmis:isLatestMajorVersion', 'cmis:isLatestVersion', 'cmis:versionLabel','cmis:isMajorVersion', 
                         'cmis:contentStreamLength', 'cmis:contentStreamId', 'cmis:contentStreamMimeType','cmis:contentStreamFileName', 
-                        'cmis:isPrivateWorkingCopy', 'app:editInLine', 'app:editInline', 'cm:lastThumbnailModification'                       
+                        'cmis:isPrivateWorkingCopy', 'app:editInLine', 'app:editInline', 'cm:lastThumbnailModification',
+                        "sys:cascadeCRC", "sys:cascadeTx"
                 ],
 
                 // properties allowed by put
