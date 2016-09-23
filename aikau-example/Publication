@@ -1,0 +1,33 @@
+{
+  "widgets": [{
+    "name": "wrighting/cmis/CmisGridWidget",
+    "timeout" : 100000,
+    "config": {
+	"targetRoot": "http://localhost:8080/share/proxy/alfresco-api/-default-/public/cmis/versions/1.1/browser",
+      "query": {
+        "statement": "SELECT cmis:objectId,cmis:name, t.cm:title, p.cgghPub:fundingCodes, p.cgghPub:publicationStatus, p.cgghPub:onProdSchedule, p.cgghPub:submittedDate FROM cgghPub:publicationFolder join cgghPub:Publication as p on cmis:objectId = p.cmis:objectId join cm:titled as t on cmis:objectId = t.cmis:objectId"
+      },
+	"timeout": 10000,
+      "columns" : [ {
+		"parentType": "cmis:item",
+            "field" : "cmis:name"
+          }, {
+            "parentType": "cm:titled",
+            "field" : "t.cm:title"
+          }, {
+            "parentType": "cgghPub:Publication",
+            "field" : "p.cgghPub:fundingCodes"
+          }, {
+		"parentType": "cgghPub:Publication",
+            "field" : "p.cgghPub:publicationStatus"
+          }, {
+            "parentType": "cgghPub:Publication",
+            "field" : "p.cgghPub:onProdSchedule"
+          }, {
+		"parentType": "cgghPub:Publication",
+            "field" : "p.cgghPub:submittedDate"
+          }
+          ]
+    }
+  }]
+}
