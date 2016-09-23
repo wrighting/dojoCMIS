@@ -132,8 +132,13 @@ define(
                             //           Description of dgrid column definition
                             var parentType = col['parentType'];
                             var propName = col['field'];
+                            var defn = {};
                             if (typeDef['type'] && typeDef['type']['queryName'] == parentType) {
                                 var propDef = typeDef['type']['propertyDefinitions'][propName];
+                                if (propDef == null) {
+                                    propName = propName.substr(propName.indexOf('.')+1);
+                                    propDef = typeDef['type']['propertyDefinitions'][propName];
+                                }
                                 if (propDef) {
                                     found = true;
                                     defn = { label: propDef['displayName'] };
