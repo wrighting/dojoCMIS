@@ -5,6 +5,8 @@ A Dojo store to access CMIS based services
 
 See http://tech.wrighting.org/2014/06/17/a-dojo-store-for-the-cmis-browser-binding
 
+Watch a demo at https://youtu.be/gpfPdB32hAQ
+
 example.html gives a simple, imperfect and incomplete, example of using the store
 
 The dojotoolkit is expected to be found in js/lib/dojo-1.9.3 (js/Gruntfile.js, js/wrighting/tests/intern.js and the example file)
